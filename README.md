@@ -20,3 +20,9 @@ Talking Book App.
 
 # Home Screen
 <img src="assets/icons/onboarding.png">  
+
+# Sign Up Screen
+<img src="assets/icons/signup.png">  
+
+# Sign In Screen
+<img src="assets/icons/login.png">  
