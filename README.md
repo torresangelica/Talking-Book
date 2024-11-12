@@ -19,4 +19,4 @@ Talking Book App.
 * HTML, CSS and JS
 
 # Home Screen
-<img src="assets/images/onboarding.png">  
+<img src="assets/icons/onboarding.png">  
