@@ -25,4 +25,7 @@ Talking Book App.
 <img src="assets/icons/signup.png">  
 
 # Sign In Screen
-<img src="assets/icons/login.png">  
+<img src="assets/icons/login.png">
+
+# Tabs Screen
+<img src="assets/icons/tabs.png">  
