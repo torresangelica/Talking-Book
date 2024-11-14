@@ -1,198 +1,125 @@
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, TextInput, ImageBackground, Image, ScrollView } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Image, ImageBackground, Alert, TextInput } from 'react-native';
 import React, { useState } from 'react';
-import Icon from 'react-native-vector-icons/FontAwesome';
 
-// Sample data for audiobooks, recommended books, top books, and categories
-const audiobooks = [
+const featuredBooks = [
   {
     id: '1',
+    title: 'Taste of Sky',
+    author: 'VentreCanard',
+    image: 'https://skinofaskinny.wordpress.com/wp-content/uploads/2019/05/105252750-352-k135626.jpg',
+  },
+  {
+    id: '2',
     title: 'It Ends With Us',
     author: 'Colleen Hoover',
     image: 'https://s3.amazonaws.com/nightjarprod/content/uploads/sites/261/2024/07/17125931/cSMdFWmajaX4oUMLx7HEDI84GkP-scaled.jpg',
   },
   {
-    id: '2',
+    id: '3',
+    title: 'Shatter Me',
+    author: 'Tahereh Mafi',
+    image: 'https://cdn.kobo.com/book-images/6f2c3e42-4411-4fd4-918a-d9ea9b0719b1/1200/1200/False/shatter-me-1.jpg',
+  },
+  {
+    id: '4',
+    title: 'Dosage of Serotonin',
+    author: 'Inksteady',
+    image: 'https://img.wattpad.com/cover/261921277-352-k950424.jpg',
+  },
+  {
+    id: '5',
     title: 'A Gentle Reminder',
-    author: 'Brittany Chen',
+    author: 'Bianca Sparacino',
     image: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1615620038i/57393737.jpg',
   },
-];
-
-const recommendedBooks = [
   {
-    id: '1',
+    id: '6',
+    title: 'It Starts With Us',
+    author: 'Colleen Hoover',
+    image: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1644605295i/60393672.jpg',
+  },
+  {
+    id: '7',
     title: 'The Seven Husbands of Evelyn Hugo',
     author: 'Taylor Jenkins Reid',
     image: 'https://d28hgpri8am2if.cloudfront.net/book_images/onix/cvr9781501161933/the-seven-husbands-of-evelyn-hugo-9781501161933_hr.jpg',
   },
   {
-    id: '2',
-    title: 'Shatter Me',
-    author: 'Tahereh Mafi',
-    image: 'https://cdn.kobo.com/book-images/6f2c3e42-4411-4fd4-918a-d9ea9b0719b1/1200/1200/False/shatter-me-1.jpg',
+    id: '8',
+    title: 'Avenues of the Diamond',
+    author: 'Gwy Saludes',
+    image: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1686020162i/55450632.jpg',
+  },
+  {
+    id: '9',
+    title: 'Living With A Half Blood',
+    author: 'April_Avery',
+    image: 'https://img.wattpad.com/99daa1e56b0232533313ba67c457388745901d55/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f776174747061642d6d656469612d736572766963652f53746f7279496d6167652f696c725a4f5542347356725666673d3d2d33362e313635353834393030653365633565623234343234323130303036312e6a7067?s=fit&w=720&h=720',
+  },
+  {
+    id: '10',
+    title: 'I Love You Since 1892',
+    author: 'Binibining Mia',
+    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlMHqREr-RPFmUAUu4rDLA6VocDms0JOOL2A&s',
   },
 ];
 
-const topBooks = [
-  {
-    id: '1',
-    title: 'The Great Gatsby',
-    author: 'F. Scott Fitzgerald',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/The_Great_Gatsby_%281924%29.jpg/220px-The_Great_Gatsby_%281924%29.jpg',
-  },
-  {
-    id: '2',
-    title: '1984',
-    author: 'George Orwell',
-    image: 'https://upload.wikimedia.org/wikipedia/en/thumb/c/c3/1984first.jpg/220px-1984first.jpg',
-  },
-];
+const Home = () => {
+  const [addedBooks, setAddedBooks] = useState({});
+  const [searchText, setSearchText] = useState('');
 
-const categories = [
-  {
-    id: '1',
-    title: 'Favorites',
-    image: 'https://example.com/favorites.jpg', // Replace with a valid image URL
-  },
-  {
-    id: '2',
-    title: 'Recently Added',
-    image: 'https://example.com/recently_added.jpg', // Replace with a valid image URL
-  },
-  {
-    id: '3',
-    title: 'Top Rated',
-    image: 'https://example.com/top_rated.jpg', // Replace with a valid image URL
-  },
-];
+  const addToLibrary = (book) => {
+    if (!addedBooks[book.id]) {
+      setAddedBooks(prevState => ({ ...prevState, [book.id]: true }));
+      Alert.alert(`${book.title} added to your library!`);
+    } else {
+      setAddedBooks(prevState => {
+        const newState = { ...prevState };
+        delete newState[book.id];
+        return newState;
+      });
+      Alert.alert(`${book.title} removed from your library.`);
+    }
+  };
 
-const Library = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-
-  const filteredAudiobooks = audiobooks.filter(book =>
-    book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    book.author.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const filteredCategories = categories.filter(category =>
-    category.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const renderCategoryItem = ({ item }) => (
-    <TouchableOpacity style={styles.recommendedItem}>
-      <Image source={{ uri: item.image }} style={styles.recommendedImage} />
-      <View style={styles.recommendedInfo}>
-        <Text style={styles.categoryTitle}>{item.title}</Text>
-      </View>
-    </TouchableOpacity>
-  );
-
-  const renderAudiobookItem = ({ item }) => (
-    <TouchableOpacity style={styles.audiobookItem}>
-      <ImageBackground source={{ uri: item.image }} style={styles.audiobookImage}>
-        <View style={styles.audiobookInfo}>
-          <Text style={styles.audiobookTitle}>{item.title}</Text>
-          <Text style={styles.audiobookAuthor}>{item.author}</Text>
-          <TouchableOpacity style={styles.playButton}>
-            <Icon name="play" size={20} color="#fff" />
-          </TouchableOpacity>
-        </View>
-      </ImageBackground>
-    </TouchableOpacity>
-  );
-
-  const renderRecommendedItem = ({ item }) => (
-    <TouchableOpacity style={styles.recommendedItem}>
-      <Image source={{ uri: item.image }} style={styles.recommendedImage} />
-      <View style={styles.recommendedInfo}>
-        <Text style={styles.recommendedTitle}>{item.title}</Text>
-        <Text style={styles.recommendedAuthor}>{item.author}</Text>
-      </View>
-    </TouchableOpacity>
-  );
-
-  const renderTopBookItem = ({ item }) => (
-    <TouchableOpacity style={styles.recommendedItem}>
-      <Image source={{ uri: item.image }} style={styles.recommendedImage} />
-      <View style={styles.recommendedInfo}>
-        <Text style={styles.topBookTitle}>{item.title}</Text>
-        <Text style={styles.topBookAuthor}>{item.author}</Text>
-      </View>
-    </TouchableOpacity>
+  const filteredBooks = featuredBooks.filter(book =>
+    book.title.toLowerCase().includes(searchText.toLowerCase())
   );
 
   return (
     <ImageBackground
-      source={{ uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQlkWR-17cC9XYmVcMpAQMqq-j8RklIhOZEQ&s' }}
+      source={{ uri: 'https://i.pinimg.com/564x/ba/6d/fe/ba6dfe66fa3b9b4478097760034912b1.jpg' }}
       style={styles.background}
+      resizeMode="cover"
     >
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.container}>
-          <Text style={styles.title}>Your Library</Text>
+      <Text style={styles.titleText}>Search Books</Text>
 
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search for a book or category..."
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
+      <TextInput
+        style={styles.searchInput}
+        placeholder="search for books..."
+        value={searchText}
+        onChangeText={setSearchText}
+      />
 
-          {searchQuery.length > 0 && (
-            <View>
-              {filteredAudiobooks.length > 0 && (
-                <FlatList
-                  data={filteredAudiobooks}
-                  keyExtractor={(item) => item.id}
-                  renderItem={renderAudiobookItem}
-                  style={styles.list}
-                  ListHeaderComponent={<Text style={styles.sectionTitle}>Audiobooks</Text>}
-                />
-              )}
-              {filteredCategories.length > 0 && (
-                <FlatList
-                  data={filteredCategories}
-                  keyExtractor={(item) => item.id}
-                  renderItem={renderCategoryItem}
-                  style={styles.list}
-                  ListHeaderComponent={<Text style={styles.sectionTitle}>Categories</Text>}
-                />
-              )}
+      <Text style={styles.sectionTitle}>Recommendations</Text>
+      <FlatList
+        data={filteredBooks}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View style={styles.bookItem}>
+            <Image source={{ uri: item.image }} style={styles.bookImage} />
+            <View style={styles.bookDetails}>
+              <Text style={styles.bookTitle}>{item.title}</Text>
+              <Text style={styles.bookAuthor}>{item.author}</Text>
             </View>
-          )}
-
-          {searchQuery.length === 0 && (
-            <View>
-              <Text style={styles.sectionTitle}>Recommended Books</Text>
-              <FlatList
-                data={recommendedBooks}
-                keyExtractor={(item) => item.id}
-                renderItem={renderRecommendedItem}
-                style={styles.list}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-              />
-              <Text style={styles.sectionTitle}>Top Books</Text>
-              <FlatList
-                data={topBooks}
-                keyExtractor={(item) => item.id}
-                renderItem={renderTopBookItem}
-                style={styles.list}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-              />
-              <Text style={styles.sectionTitle}>Categories</Text>
-              <FlatList
-                data={categories}
-                keyExtractor={(item) => item.id}
-                renderItem={renderCategoryItem}
-                style={styles.list}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-              />
-            </View>
-          )}
-        </View>
-      </ScrollView>
+            {addedBooks[item.id] && (
+              <Text style={styles.addButtonText}>
+                In Library
+              </Text>
+            )}
+          </View>
+        )}
+      />
     </ImageBackground>
   );
 };
@@ -201,110 +128,61 @@ const styles = StyleSheet.create({
   background: {
     flex: 1,
     justifyContent: 'center',
+  },
+  titleText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#000000',
+    textAlign: 'left',
+    marginBottom: 15,
     padding: 20,
-  },
-  scrollContainer: {
-    paddingBottom: 20,
-  },
-  container: {
-    padding: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.5)', // Semi-transparent background
-    borderRadius: 10,
-    elevation: 5,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-    color: '#333',
-  },
-  searchInput: {
-    height: 45,
-    borderColor: '#00796b',
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    marginBottom: 20,
-    fontSize: 16,
-    backgroundColor: '#f9f9f9',
-  },
-  audiobookItem: {
-    marginBottom: 10,
-    borderRadius: 8,
-    overflow: 'hidden',
-  },
-  audiobookImage: {
-    height: 120,
-    justifyContent: 'flex-end',
-    padding: 10,
-    borderRadius: 8,
-  },
-  audiobookInfo: {
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    borderRadius: 8,
-    padding: 10,
-  },
-  audiobookTitle: {
-    fontSize: 18,
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  audiobookAuthor: {
-    fontSize: 14,
-    color: '#fff',
-  },
-  playButton: {
-    marginTop: 5,
-    padding: 8,
-    backgroundColor: '#28a745',
-    borderRadius: 5,
-    alignItems: 'center',
-  },
-  recommendedItem: {
-    backgroundColor: '#e0f7fa',
-    borderRadius: 8,
-    margin: 10,
-    overflow: 'hidden',
-    width: 150,
-  },
-  recommendedImage: {
-    height: 200,
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
-  },
-  recommendedInfo: {
-    padding: 10,
-  },
-  recommendedTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  recommendedAuthor: {
-    fontSize: 14,
-    color: '#555',
-  },
-  topBookTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  topBookAuthor: {
-    fontSize: 14,
-    color: '#555',
-  },
-  categoryTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
   },
   sectionTitle: {
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: '#333',
+    paddingHorizontal: 20,
   },
-  list: {
+  searchInput: {
+    height: 40,
+    borderColor: 'black',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 10,
     marginBottom: 20,
+    marginHorizontal: 20,
+  },
+  bookItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 15,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 8,
+    marginBottom: 10,
+    justifyContent: 'space-between',
+  },
+  bookImage: {
+    width: 50,
+    height: 75,
+    borderRadius: 5,
+    marginRight: 15,
+  },
+  bookDetails: {
+    flex: 1,
+    marginRight: 10,
+  },
+  bookTitle: {
+    fontSize: 15,
+    fontWeight: 'bold',
+  },
+  bookAuthor: {
+    fontSize: 13,
+    color: '#555',
+  },
+  addButtonText: {
+    fontWeight: 'bold',
+    color: '#28a745',
   },
 });
 
-export default Library;
+export default Home;

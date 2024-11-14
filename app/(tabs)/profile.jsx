@@ -1,222 +1,230 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Animated } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState } from 'react';
+import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity, TextInput, Modal, ScrollView, ImageBackground } from 'react-native';
+import { useRouter } from 'expo-router'; // Import the router
 
 const Profile = () => {
-  const navigation = useNavigation();
-  const user = {
-    name: 'John Doe',
-    email: 'johndoe@example.com',
-    profilePicture: 'https://your-image-url.com/profile.jpg',
-    bio: 'Avid reader and writer. Love exploring new worlds through stories.',
-    stats: {
-      stories: 10,
-      followers: 250,
-      following: 150,
-    },
-    favoriteGenres: ['Fantasy', 'Romance', 'Mystery'],
+  const router = useRouter(); // Initialize the router
+  const [isEditing, setIsEditing] = useState(false);
+  const [userName, setUserName] = useState('Angelica C. Torres');
+  const [userTagline, setUserTagline] = useState('Love exploring new worlds through stories.');
+
+  const userFavorites = [
+    { id: '1', title: 'It Ends With Us', author: 'Colleen Hoover', image: 'https://s3.amazonaws.com/nightjarprod/content/uploads/sites/261/2024/07/17125931/cSMdFWmajaX4oUMLx7HEDI84GkP-scaled.jpg' },
+    { id: '2', title: 'Shatter Me', author: 'Tahereh Mafi', image: 'https://cdn.kobo.com/book-images/6f2c3e42-4411-4fd4-918a-d9ea9b0719b1/1200/1200/False/shatter-me-1.jpg' },
+    { id: '3', title: 'Twisted Love', author: 'Ana Huang', image: 'https://cdn01.sapnaonline.com/product_media/9780349434278/md_9780349434278_080820241012087.jpg' },
+  ];
+
+  const renderFavorite = ({ item }) => (
+    <View style={styles.favoriteItem}>
+      <Image source={{ uri: item.image }} style={styles.bookCover} />
+      <Text style={styles.favoriteTitle}>{item.title}</Text>
+    </View>
+  );
+
+  const handleLogout = () => {
+    // Navigate to sign-in page on logout
+    router.push(''); // Change this path to your desired logout destination
   };
-
-  const animatedValue = new Animated.Value(0);
-
-  const animateProfile = () => {
-    Animated.timing(animatedValue, {
-      toValue: 1,
-      duration: 700,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  React.useEffect(() => {
-    animateProfile();
-  }, []);
-
-  const translateY = animatedValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: [50, 0],
-  });
 
   return (
-    <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Animated.View style={[styles.titleContainer, { transform: [{ translateY }] }]}>
-          <Text style={styles.title}>Profile</Text>
-        </Animated.View>
-
-        <Animated.Image
-          source={{ uri: user.profilePicture }}
-          style={[styles.profileImage, { transform: [{ translateY }] }]}
-        />
-
-        <View style={styles.profileInfo}>
-          <Text style={styles.label}>Name:</Text>
-          <Text style={styles.info}>{user.name}</Text>
+    <ImageBackground
+      source={{ uri: 'https://i.pinimg.com/564x/ba/6d/fe/ba6dfe66fa3b9b4478097760034912b1.jpg' }}
+      style={styles.background}
+    >
+      <View style={styles.container}>
+        <View style={styles.profileHeader}>
+          <Image
+            source={{ uri: 'https://i.pinimg.com/564x/2c/4e/64/2c4e64f4263ba2d174104c367ec9a698.jpg' }}
+            style={styles.profileImage}
+          />
+          <Text style={styles.userName}>{userName}</Text>
+          <Text style={styles.userTagline}>{userTagline}</Text>
         </View>
 
-        <View style={styles.profileInfo}>
-          <Text style={styles.label}>Email:</Text>
-          <Text style={styles.info}>{user.email}</Text>
+        <Text style={styles.favoritesTitle}>Favorite Books</Text>
+
+        <ScrollView horizontal contentContainerStyle={styles.favoritesList}>
+          <FlatList
+            data={userFavorites}
+            renderItem={renderFavorite}
+            keyExtractor={(item) => item.id}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+          />
+        </ScrollView>
+
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.editButton} onPress={() => setIsEditing(true)}>
+            <Text style={styles.editButtonText}>Edit Profile</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+            <Text style={styles.logoutButtonText}>Log Out</Text>
+          </TouchableOpacity>
         </View>
 
-        <View style={styles.profileInfo}>
-          <Text style={styles.label}>Bio:</Text>
-          <Text style={styles.info}>{user.bio}</Text>
-        </View>
-
-        <View style={styles.statsContainer}>
-          <Text style={styles.statsTitle}>Statistics</Text>
-          <View style={styles.stats}>
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>{user.stats.stories}</Text>
-              <Text style={styles.statLabel}>Stories</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>{user.stats.followers}</Text>
-              <Text style={styles.statLabel}>Followers</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>{user.stats.following}</Text>
-              <Text style={styles.statLabel}>Following</Text>
+        <Modal visible={isEditing} animationType="slide" transparent={true}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContainer}>
+              <Text style={styles.modalTitle}>Edit Profile</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Name"
+                value={userName}
+                onChangeText={setUserName}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Tagline"
+                value={userTagline}
+                onChangeText={setUserTagline}
+              />
+              <TouchableOpacity style={styles.saveButton} onPress={() => setIsEditing(false)}>
+                <Text style={styles.saveButtonText}>Save</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.cancelButton} onPress={() => setIsEditing(false)}>
+                <Text style={styles.cancelButtonText}>Close</Text>
+              </TouchableOpacity>
             </View>
           </View>
-        </View>
-
-        <View style={styles.genresContainer}>
-          <Text style={styles.genresTitle}>Favorite Genres</Text>
-          <Text style={styles.genres}>{user.favoriteGenres.join(', ')}</Text>
-        </View>
-
-        <TouchableOpacity style={styles.editButton} onPress={() => navigation.navigate('EditProfile', { user })}>
-          <Text style={styles.buttonText}>Edit Profile</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.logoutButton}>
-          <Text style={styles.buttonText}>Log Out</Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </View>
+        </Modal>
+      </View>
+    </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#f4f4f4',
+    padding: 16,
+    backgroundColor: 'transparent',
   },
-  scrollContainer: {
+  profileHeader: {
     alignItems: 'center',
-    paddingBottom: 20,
-  },
-  titleContainer: {
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
+    marginBottom: 24,
   },
   profileImage: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    borderWidth: 3,
-    borderColor: '#00796b',
-    alignSelf: 'center',
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 8,
   },
-  profileInfo: {
-    marginBottom: 20,
-    width: '100%',
-    paddingHorizontal: 20,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 15,
-    elevation: 2,
-  },
-  label: {
-    fontSize: 18,
+  userName: {
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#00796b',
   },
-  info: {
+  userTagline: {
     fontSize: 16,
-    color: '#555',
+    color: '#666',
+    marginBottom: 8,
+    textAlign: 'center',
   },
-  statsContainer: {
-    width: '100%',
-    paddingHorizontal: 20,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 15,
-    elevation: 2,
-    marginBottom: 20,
-  },
-  statsTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#00796b',
-    marginBottom: 10,
-  },
-  stats: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  statItem: {
-    alignItems: 'center',
-  },
-  statValue: {
+  favoritesTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#FF5C5C',
+    marginVertical: 16,
+    textAlign: 'left',
   },
-  statLabel: {
+  favoritesList: {
+    flexDirection: 'row',
+    paddingBottom: 16,
+  },
+  favoriteItem: {
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  bookCover: {
+    width: 100,
+    height: 150,
+    borderRadius: 5,
+  },
+  favoriteTitle: {
     fontSize: 14,
-    color: '#555',
+    textAlign: 'center',
+    marginTop: 8,
   },
-  genresContainer: {
-    width: '100%',
-    paddingHorizontal: 20,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 15,
-    elevation: 2,
-    marginBottom: 20,
-  },
-  genresTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#00796b',
-  },
-  genres: {
-    fontSize: 16,
-    color: '#555',
+  buttonContainer: {
+    marginTop: 20,
+    alignItems: 'center',
   },
   editButton: {
-    marginTop: 15,
-    padding: 15,
+    padding: 10,
     backgroundColor: '#00796b',
-    borderRadius: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+    width: '90%',
     alignItems: 'center',
-    width: '100%',
-    elevation: 2,
+  },
+  editButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
   logoutButton: {
-    marginTop: 10,
-    padding: 15,
-    backgroundColor: '#FF5C5C',
+    padding: 16,
+    borderRadius: 8,
+    backgroundColor: '#28a745',
+    alignItems: 'center',
+    width: '90%',
+  },
+  logoutButtonText: {
+    color: '#ffffff',
+    fontWeight: 'bold',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    width: '80%',
+    padding: 20,
+    backgroundColor: '#fff',
     borderRadius: 10,
     alignItems: 'center',
-    width: '100%',
-    elevation: 2,
+    justifyContent: 'center',
   },
-  buttonText: {
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  input: {
+    height: 40,
+    width: '90%',
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 5,
+    marginBottom: 15,
+    paddingHorizontal: 10,
+  },
+  saveButton: {
+    backgroundColor: '#00796b',
+    padding: 12,
+    borderRadius: 5,
+    alignItems: 'center',
+    width: '90%',
+    marginBottom: 10,
+  },
+  saveButtonText: {
     color: '#fff',
-    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  cancelButton: {
+    backgroundColor: '#28a745',
+    padding: 12,
+    borderRadius: 5,
+    alignItems: 'center',
+    width: '90%',
+  },
+  cancelButtonText: {
+    color: '#fff',
     fontWeight: 'bold',
   },
 });
