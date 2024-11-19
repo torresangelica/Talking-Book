@@ -33,7 +33,7 @@ https://youtube.com/shorts/EQw45u_MqQk?feature=share
 <img src="assets/images/search.png">
 <img src="assets/images/profile.png">
 
-#Screen Demo
+# Screen Demo
 https://youtube.com/shorts/EQw45u_MqQk?feature=share
 
 
