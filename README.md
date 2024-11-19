@@ -27,4 +27,8 @@ Talking Book App.
 <img src="assets/icons/login.png">
 
 # Tabs Screen
-<img src="assets/icons/tabs.png">  
+<img src="assets/images/home.png">  
+<img src="assets/images/library.png">
+<img src="assets/images/search.png">
+<img src="assets/images/profile.png">
+
