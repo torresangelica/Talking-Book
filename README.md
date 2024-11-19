@@ -2,16 +2,15 @@
 Talking Book App.
 
 # Features
-* Share Projects
-* Message other developers
-* Rate others work
-* Search other developers
+* Audio Playback Controls
+* Personalization and Customization
+* Discovery and Search
+* Accessibility Features
 
 # Course Overview
-* Basic React Native Components
-* Database Design using Appwrite
+* Voice Narration and Performance
 * User Registration & Authenticaiton
-* Deployment
+* Narration Techniques
 
 # Tech Stack
 * React Native
